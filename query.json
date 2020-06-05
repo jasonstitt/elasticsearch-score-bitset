@@ -1,0 +1,95 @@
+{
+  "size" : 0,
+  "query": {
+    "bool": {
+      "minimum_should_match": 1,
+      "should": [
+        {
+          "constant_score": {
+            "boost": 1,
+            "filter": {
+              "range": {
+                "apples": {
+                  "gte": 50
+                }
+              }
+            }
+          }
+        },
+        {
+          "constant_score": {
+            "boost": 2,
+            "filter": {
+              "range": {
+                "bananas": {
+                  "gte": 50
+                }
+              }
+            }
+          }
+        },
+        {
+          "constant_score": {
+            "boost": 4,
+            "filter": {
+              "range": {
+                "pears": {
+                  "gte": 50
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "exclusive": {
+      "scripted_metric": {
+        "init_script": {
+          "id": "bitset_example_init"
+        },
+        "map_script": {
+          "id": "bitset_example_map"
+        },
+        "combine_script": {
+          "id": "bitset_example_combine"
+        },
+        "reduce_script": {
+          "id": "bitset_example_reduce"
+        }
+      }
+    },
+    "exclusive_check": {
+      "filter": {
+        "bool": {
+          "filter": [
+            {
+              "range": {
+                "apples": {
+                  "gte": 50
+                }
+              }
+            }
+          ],
+          "must_not": [
+            {
+              "range": {
+                "bananas": {
+                  "gte": 50
+                }
+              }
+            },
+            {
+              "range": {
+                "pears": {
+                  "gte": 50
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
